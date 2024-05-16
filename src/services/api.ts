@@ -7,11 +7,14 @@ import { AuthTokenError } from "./errors/AuthTokenError";
 export function setupAPIClient( context?: any ){
 
     let cookies = parseCookies( context );
+    const token = cookies['@nextauth.token'];
 
     const api = axios.create({
         baseURL: 'https://api.homologation.cliqdrive.com.br',
         headers: {
-            Authorization: `Bearer ${cookies['@nextauth.token']}`
+            Authorization: token ? `Bearer ${token}` : '',
+            Accept: 'application/json;version=v1_web',
+            "Content-Type": 'application/json'
         }
     });
 

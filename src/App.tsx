@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom"
 import { Layout } from "./components/layout"
 import { Home } from "./pages/home"
 import { Profile } from "./pages/profile"
+import { Private } from "./routes/Private"
 
 const router = createBrowserRouter([
   {
@@ -13,7 +14,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/profile',
-        element: <Profile/>
+        element: <Private> <Profile/> </Private>
       },
       
     ]

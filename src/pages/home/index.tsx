@@ -12,8 +12,9 @@ export function Home(){
     const { signIn } = useContext(AuthContext);
     const [ email, setEmail ] = useState('');
     const [ password, setPassword ] = useState('');
+    
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [ loading, setLoading ] = useState( false );
 
     const handleSubmit = async ( e: FormEvent ) => {
         e.preventDefault();
@@ -23,9 +24,9 @@ export function Home(){
             return;
           }
 
-        setLoading(true);
+          setLoading(true);
 
-        let data = {
+          let data = {
             email,
             password
           };
@@ -50,6 +51,7 @@ export function Home(){
                         name='email'
                         value={email}
                         onChange={ (e) => setEmail(e.target.value)}
+                        autoComplete="username"
                     />     
                     
                     <h2 className='font-nunito text-lg-input leading-line-height-input font-bold mt-9 mb-4'>Password</h2>
@@ -59,6 +61,7 @@ export function Home(){
                         name='password'
                         value={password}
                         onChange={ (e) => setPassword(e.target.value)}
+                        autoComplete="current-password"
                     />
 
                     <Button 

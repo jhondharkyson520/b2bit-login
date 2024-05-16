@@ -6,9 +6,10 @@ interface InputProps{
     name: string;
     value: any;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+    autoComplete?: string;
 }
 
-export function Input({ name, placeholder, type, value, onChange}: InputProps){
+export function Input({ name, placeholder, type, value, onChange, autoComplete}: InputProps){
     return(
         <div>
             <input
@@ -17,7 +18,8 @@ export function Input({ name, placeholder, type, value, onChange}: InputProps){
                 type={type}
                 id={name}
                 value={value} 
-                onChange={onChange}               
+                onChange={onChange}
+                autoComplete={autoComplete}               
             />
         </div>
     )

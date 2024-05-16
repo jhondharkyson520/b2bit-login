@@ -1,22 +1,23 @@
-import { useNavigate } from 'react-router-dom';
-import { destroyCookie, parseCookies, setCookie } from 'nookies';
-import { createContext, ReactNode, useState, useEffect} from 'react';
+import { createContext, ReactNode, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../services/apiClient';
-
+import { parseCookies, setCookie, destroyCookie } from 'nookies';
+import { router } from '../App';
 
 type AuthContextData = {
-    user: UserProps;
+    user: UserProps | undefined;
     isAuthenticated: boolean;
     signIn: (credentials: SignInProps) => Promise<void>;
     logout: () => void;
+    signed: boolean;
 }
 
-type UserProps ={
+type UserProps = {
     id: string;
     name: string;
     email: string;
     avatar: Avatar;
+    tokens: TokenProps;
 }
 
 type SignInProps = {
@@ -24,6 +25,10 @@ type SignInProps = {
     password: string;
 }
 
+type TokenProps = {
+    refresh: string;
+    access: string;
+}
 
 type AuthProviderProps = {
     children: ReactNode;
@@ -34,93 +39,65 @@ type Avatar = {
     image_high_url: string;
     image_medium_url: string;
     image_low_url: string;
-  }
-
+}
 
 export const AuthContext = createContext({} as AuthContextData);
 
-export function logout(){
-    const navigate = useNavigate();
-
-    try{
-      destroyCookie(undefined, '@nextauth.token')
-      navigate('/', {replace: true});
-    }catch{
-        toast.error('Erro ao deslogar');
-        console.log('erro ao deslogar')
-    }
-  }
-
-
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<UserProps | undefined>(undefined);
-    const isAuthenticated = !!user;    
-    const navigate = useNavigate();
+    const isAuthenticated = !!user;
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        const { '@nextauth.token': tokens } = parseCookies();
 
-        const { '@nextauth.token': token} = parseCookies();
-
-
-        if(token){
+        if (tokens) {
             api.get('/auth/profile/').then(response => {
-                const { id, name, email, avatar } = response.data;
-
-                setUser({
-                    id,
-                    name,
-                    email,
-                    avatar
-                })
-            }).catch(() => {
-
-                logout();
+                const { id, name, email, avatar, tokens } = response.data;
                 
+                setUser({ id, name, email, avatar, tokens });
+                console.log('avatar', user?.avatar);
+                
+            }).catch(() => {
+                logout();
             })
-
         }
-
-
-    }, [])
+    }, []);
 
     async function signIn({ email, password }: SignInProps) {
-        const navigate = useNavigate();
         try {
-            const response = await api.post('/auth/login/', {
-                email,
-                password
-            })
-           console.log(response.data);
 
-            const {id, name, token, avatar} = response.data;
+            const response = await api.post('/auth/login/', { email, password });
 
-            setCookie(undefined, '@nextauth.token', token, {
-                maxAge: 60 * 60 * 24 * 160,
-                path: '/'
-            })
+            const { id, name, tokens, avatar } = response.data;
 
-            setUser({
-                id,
-                name,
-                email,
-                avatar
-            })
-
-            api.defaults.headers['Authorization'] = `Bearer ${token}`;
-            toast.success('Logado com sucesso');
-            navigate('/profile');
             
+
+            setCookie(undefined, '@nextauth.token', tokens.access, { maxAge: 60 * 60 * 24 * 160, path: '/' });
+            setUser({ id, name, email, avatar, tokens });
+
+            api.defaults.headers['Authorization'] = `Bearer ${tokens.access}`;
+            toast.success('Logado com sucesso');
+            setLoading(true);
+            router.navigate('/profile');
+
         } catch (err) {
             toast.error('Erro ao acessar');
-            console.log('Erro ao acessar', err)
+            console.log('Erro ao acessar', err);
         }
     }
 
     
 
     return (
-        <AuthContext.Provider value={{ user: user || ({} as UserProps), isAuthenticated, signIn, logout}}>
+        <AuthContext.Provider value={{ user, isAuthenticated, signIn, logout, signed: !!user }}>
             {children}
         </AuthContext.Provider>
     );
 }
+
+    export function logout() {
+        destroyCookie(undefined, '@nextauth.token');
+        localStorage.removeItem('@nextauth.token');
+        router.navigate('/');
+    }

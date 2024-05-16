@@ -1,17 +1,23 @@
-import { useState } from 'react'
+import { FormEvent, useContext, useState } from 'react'
 import { Input } from '../../components/input';
 import { Header } from '../../components/header';
 import { Container } from '../../components/container';
+import { AuthContext } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import avatarNull from '../../assets/avatarNull.png'
 
 
 export function Profile(){
     const [ email, setEmail ] = useState();
     const [ nome, setNome] = useState();
 
-    function handleSubmit(){
-        
-    }
+    const { logout, user } = useContext(AuthContext);
 
+    const handleSubmit = async ( e: FormEvent ) => {
+        e.preventDefault();
+
+          await logout();
+    }
     return(
                     
             <Container className="bg-profile-page">
@@ -20,7 +26,7 @@ export function Profile(){
                 <div className="bg-profile w-profile h-profile  rounded-radius-login drop-shadow-lg flex flex-col items-center justify-center">
 
                 <h2 className='font-nunito  font-semibold text-text-title-profile leading-line-height-title-profile mt-5'>Profile picture</h2>
-                <img className='w-img-profile h-img-profile rounded-radius-img-profile mt-3' src="https://cognuro-app-assets.s3.amazonaws.com/media/images/IMG_4452_low_5Vh2hYj.jpg" alt="" />
+                <img className='w-img-profile h-img-profile rounded-radius-img-profile mt-3' src={user?.avatar ? user?.avatar.image_high_url : avatarNull} alt="" />
 
                 <form className="flex flex-col" onSubmit={handleSubmit}>
                     
@@ -30,7 +36,7 @@ export function Profile(){
                             type="text" 
                             placeholder="Christine James"
                             name='nome'
-                            value={nome}
+                            value={user?.name}
                         />
                         
                     </div>
@@ -42,7 +48,7 @@ export function Profile(){
                             type="text" 
                             placeholder="christinejames@gmail.com"
                             name='email'
-                            value={email}
+                            value={user?.email}
                         />
                     </div>                         
                     
