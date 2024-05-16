@@ -1,23 +1,54 @@
-import { FormEvent, useContext, useState } from 'react'
+import { FormEvent, useContext, useEffect, useState } from 'react'
 import { Input } from '../../components/input';
 import { Header } from '../../components/header';
 import { Container } from '../../components/container';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import avatarNull from '../../assets/avatarNull.png'
+import { api } from '../../services/apiClient';
+import { parseCookies } from 'nookies';
 
 
 export function Profile(){
-    const [ email, setEmail ] = useState();
-    const [ nome, setNome] = useState();
-
+    
     const { logout, user } = useContext(AuthContext);
+    const [ email, setEmail ] = useState('');
+    const [ nome, setNome] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const { '@nextauth.token': tokens } = parseCookies();
+
+        if (tokens) {
+            api.get('/auth/profile/').then(response => {
+                const { name, email} = response.data;
+                
+                setEmail(email);
+                setNome(name);
+                console.log('teste');
+                
+                
+            }).catch(() => {
+                logout();
+            })
+        }
+    }, []);
+
 
     const handleSubmit = async ( e: FormEvent ) => {
         e.preventDefault();
 
           await logout();
     }
+
+    const handleNomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNome(e.target.value);
+    }
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(e.target.value);
+    }
+
     return(
                     
             <Container className="bg-profile-page">
@@ -36,7 +67,8 @@ export function Profile(){
                             type="text" 
                             placeholder="Christine James"
                             name='nome'
-                            value={user?.name}
+                            value={nome}                            
+                            onChange={ handleNomeChange }
                         />
                         
                     </div>
@@ -48,7 +80,8 @@ export function Profile(){
                             type="text" 
                             placeholder="christinejames@gmail.com"
                             name='email'
-                            value={user?.email}
+                            value={email}
+                            onChange={ handleEmailChange }
                         />
                     </div>                         
                     

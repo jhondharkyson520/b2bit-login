@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext.tsx';
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Toaster
-      position="top-right"
+      position="top-center"
       reverseOrder={false}
     />
       <AuthProvider>

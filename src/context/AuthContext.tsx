@@ -56,7 +56,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const { id, name, email, avatar, tokens } = response.data;
                 
                 setUser({ id, name, email, avatar, tokens });
-                console.log('avatar', user?.avatar);
                 
             }).catch(() => {
                 logout();
@@ -81,9 +80,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setLoading(true);
             router.navigate('/profile');
 
-        } catch (err) {
-            toast.error('Erro ao acessar');
-            console.log('Erro ao acessar', err);
+        } catch (err: any) {
+            if (err.response && err.response.data && err.response.data.detail) {
+                toast.error(err.response.data.detail);
+            } else {
+                toast.error('Erro ao acessar');
+            }
         }
     }
 
