@@ -1,66 +1,90 @@
-import imgLogo from '../../assets/logo.svg'
-import { FormEvent, useContext, useState } from 'react'
+import imgLogo from '../../assets/logo.svg';
+import { useContext, useEffect, useState } from 'react';
 import { Input } from '../../components/input';
 import { Button } from '../../components/button';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { Container } from '../../components/container';
 import toast from 'react-hot-toast';
 import { AuthContext } from '../../context/AuthContext';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
+export function Home() {
 
-export function Home(){
     const { signIn } = useContext(AuthContext);
-    const [ email, setEmail ] = useState('');
-    const [ password, setPassword ] = useState('');
-    
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const [serverErrors, setServerErrors] = useState<{ email?: string; password?: string }>({});
 
-    const handleSubmit = async ( e: FormEvent ) => {
-        e.preventDefault();
+    const validationSchema = Yup.object().shape({
 
-        if(email == '' || password == ''){
-            toast.error('Preencha todos os campos');
-            return;
-          }
+        email: Yup.string().email('Email inválido').required('Email é obrigatório'),
+        password: Yup.string().required('Senha é obrigatória')
 
-          setLoading(true);
+    });
 
-          let data = {
-            email,
-            password
-          };
-      
-          await signIn(data);
-          setLoading(false);
-    }
+    const formik = useFormik({
 
-    return(
-        <Container className='bg-home-page items-center justify-center'>
+        initialValues: {
+
+            email: '',
+            password: ''
+
+        },
+        validationSchema,
+        onSubmit: () => {}
+
+    });
+
+    const handleSubmit = async () => {
+
+        try {
+
+            await signIn(formik.values);
+
+        } catch (err) {           
+                
+            toast.error('Erro ao acessar');
+                
+        }
+        
+    };
+
+    useEffect(() => {
+
+        formik.validateForm();
+
+    }, [serverErrors]);
+
+    return (
+
+        <Container className='bg-home-page items-center justify-center'>            
             <div className="bg-login w-login h-login rounded-radius-login drop-shadow-2xl flex flex-col items-center">
+
                 <div className="flex mt-14">
-                    <img src={imgLogo} alt="b2bit logo" className='w-logo h-logo'/>
+                    <img src={imgLogo} alt="b2bit logo" className='w-logo h-logo' />
                 </div>
 
-                <form className="flex flex-col w-input h-input" onSubmit={handleSubmit}>
-                    
+                <form className="flex flex-col w-input h-input" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+
                     <h2 className='font-nunito text-lg-input leading-line-height-input font-bold mt-9 mb-4'>E-mail</h2>
                     <Input 
-                        type="text" 
+                        type="email" 
                         placeholder="@gmail.com"
                         name='email'
-                        value={email}
-                        onChange={ (e) => setEmail(e.target.value)}
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.email && formik.errors.email ? formik.errors.email : serverErrors.email}
                         autoComplete="username"
-                    />     
-                    
+                    />
+
                     <h2 className='font-nunito text-lg-input leading-line-height-input font-bold mt-9 mb-4'>Password</h2>
                     <Input 
                         type="password" 
                         placeholder="*************"
                         name='password'
-                        value={password}
-                        onChange={ (e) => setPassword(e.target.value)}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.password && formik.errors.password ? formik.errors.password : serverErrors.password}
                         autoComplete="current-password"
                     />
 
@@ -74,7 +98,8 @@ export function Home(){
                     </Button>
 
                 </form>
+                
             </div>
         </Container>
-    )
+    );
 }
