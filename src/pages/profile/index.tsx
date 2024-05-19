@@ -69,7 +69,7 @@ export function Profile(){
                     </h2>
                     <img 
                         className='w-img-profile h-img-profile rounded-radius-img-profile mt-3' 
-                        src={user?.avatar ? user?.avatar.image_high_url : avatarNull} 
+                        src={user?.avatar && user.avatar.image_high_url ? user?.avatar.image_high_url : avatarNull} 
                         alt="Imagem avatar profile" 
                     />
 

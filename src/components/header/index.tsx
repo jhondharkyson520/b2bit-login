@@ -2,14 +2,21 @@ import { useContext } from "react";
 import { Button } from "../button";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import { router } from "../../App";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
   const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    const handleLogout = async ( ) => {
-       
-          toast.success("User logged out successfully");
-          await logout();
+    const handleLogout = async () => {
+        try {
+            await logout();
+            toast.success("User logged out successfully");
+            navigate('/'); // Redireciona para a página inicial após o logout
+        } catch (err) {
+            toast.error("Error logging out");
+        }
     }
 
     return (

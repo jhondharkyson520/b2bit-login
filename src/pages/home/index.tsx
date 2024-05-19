@@ -7,11 +7,13 @@ import toast from 'react-hot-toast';
 import { AuthContext } from '../../context/AuthContext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 export function Home() {
 
-    const { signIn } = useContext(AuthContext);
+    const { signIn, isAuthenticated } = useContext(AuthContext);
     const [serverErrors, setServerErrors] = useState<{ email?: string; password?: string }>({});
+    const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({
 
@@ -52,6 +54,14 @@ export function Home() {
         formik.validateForm();
 
     }, [serverErrors]);
+    
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/profile');
+        }
+    }, [isAuthenticated, navigate]);
+    
 
     return (
 
