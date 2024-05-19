@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export function Home() {
 
     const { signIn, isAuthenticated } = useContext(AuthContext);
-    const [serverErrors, setServerErrors] = useState<{ email?: string; password?: string }>({});
+    const [serverErrors] = useState<{ email?: string; password?: string }>({});
     const navigate = useNavigate();
 
     const validationSchema = Yup.object().shape({

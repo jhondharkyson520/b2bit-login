@@ -3,7 +3,6 @@ import { Input } from '../../components/input';
 import { Header } from '../../components/header';
 import { Container } from '../../components/container';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import avatarNull from '../../assets/avatarNull.png'
 import { api } from '../../services/apiClient';
 import { parseCookies } from 'nookies';

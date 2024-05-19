@@ -46,7 +46,7 @@ export const AuthContext = createContext({} as AuthContextData);
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<UserProps | undefined>(undefined);
     const isAuthenticated = !!user;
-    const [loading, setLoading] = useState(false);
+    //const [loading, setLoading] = useState(false);
 
     useEffect(() => {
 
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             api.defaults.headers['Authorization'] = `Bearer ${tokens.access}`;
 
             toast.success('Logado com sucesso');
-            setLoading(true);
+            //setLoading(true);
             router.navigate('/profile');
 
         } catch (err: any) {

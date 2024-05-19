@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { Button } from "../button";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import { router } from "../../App";
 import { useNavigate } from "react-router-dom";
 
 export function Header() {
