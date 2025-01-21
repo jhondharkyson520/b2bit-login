@@ -1,73 +1,52 @@
 import imgLogo from '../../assets/logo.svg';
-import { useContext, useEffect, useState } from 'react';
-import { Input } from '../../components/input';
-import { Button } from '../../components/button';
-import { Container } from '../../components/container';
+import {useContext, useEffect, useState} from 'react';
+import {Input} from '../../components/input';
+import {Button} from '../../components/button';
+import {Container} from '../../components/container';
 import toast from 'react-hot-toast';
-import { AuthContext } from '../../context/AuthContext';
+import {AuthContext} from '../../context/AuthContext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 export function Home() {
-
-    const { signIn, isAuthenticated } = useContext(AuthContext);
-    const [serverErrors] = useState<{ email?: string; password?: string }>({});
+    const {signIn, isAuthenticated} = useContext(AuthContext);
+    const [serverErrors] = useState<{email?: string; password?: string}>({});
     const navigate = useNavigate();
-
     const validationSchema = Yup.object().shape({
-
         email: Yup.string().email('Email inválido').required('Email é obrigatório'),
         password: Yup.string().required('Senha é obrigatória')
-
     });
-
     const formik = useFormik({
-
         initialValues: {
-
             email: '',
             password: ''
-
         },
         validationSchema,
         onSubmit: () => {}
-
     });
 
     const handleSubmit = async () => {
-
         try {
-
             await signIn(formik.values);
-
-        } catch (err) {           
-                
-            toast.error('Erro ao acessar');
-                
-        }
-        
+        } catch (err) { 
+            toast.error('Erro ao acessar');                
+        }        
     };
 
     useEffect(() => {
-
         formik.validateForm();
-
-    }, [serverErrors]);
-    
+    }, [serverErrors]);    
 
     useEffect(() => {
         if (isAuthenticated) {
             navigate('/profile');
         }
-    }, [isAuthenticated, navigate]);
-    
+    }, [isAuthenticated, navigate]);    
 
     return (
-
         <Container className='bg-home-page items-center justify-center'>            
             <div className="bg-login w-login h-login rounded-radius-login drop-shadow-2xl flex flex-col items-center">
-
                 <div className="flex mt-14">
                     <img src={imgLogo} alt="b2bit logo" className='w-logo h-logo' />
                 </div>
@@ -107,8 +86,7 @@ export function Home() {
                         Sign In
                     </Button>
 
-                </form>
-                
+                </form>                
             </div>
         </Container>
     );
